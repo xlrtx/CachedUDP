@@ -18,8 +18,8 @@ public class CachedUDPHeader {
   // Packet Type
   public static final int CU_REQ_CACHE          = 1;
   public static final int CU_RSP_CACHE          = 2;
-  public static final int CU_REQ_NOCHA          = 3;
-  public static final int CU_RSP_NOCHA          = 4;
+  public static final int CU_REQ_NOCAC          = 3;
+  public static final int CU_RSP_NOCAC          = 4;
   
 
   private int packetOpt;
@@ -139,8 +139,8 @@ public class CachedUDPHeader {
     if ( packetId != CU_PACKET_ID ||
         packetOpt != CU_REQ_CACHE ||
         packetOpt != CU_RSP_CACHE ||
-        packetOpt != CU_REQ_NOCHA ||
-        packetOpt != CU_RSP_NOCHA ){
+        packetOpt != CU_REQ_NOCAC ||
+        packetOpt != CU_RSP_NOCAC ){
       
       
       // Not a CachedUDP packet
@@ -189,7 +189,7 @@ public class CachedUDPHeader {
     
     
     if ( this.packetOpt == CU_REQ_CACHE ||
-         this.packetOpt == CU_REQ_NOCHA ) {
+         this.packetOpt == CU_REQ_NOCAC ) {
       
       
       return true;
@@ -215,7 +215,7 @@ public class CachedUDPHeader {
     
     
     if ( this.packetOpt == CU_RSP_CACHE ||
-         this.packetOpt == CU_RSP_NOCHA ) {
+         this.packetOpt == CU_RSP_NOCAC ) {
      
      
      return true;

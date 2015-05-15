@@ -134,7 +134,7 @@ public class CachedUDPServer implements CachedUDPDefs{
     
     
     // This is our response
-    ByteBuffer upLryDataOut = null;
+    ByteBuffer upLyrDataOut = null;
     // Is this response came from cache?
     boolean usingCache = false;
     
@@ -151,7 +151,7 @@ public class CachedUDPServer implements CachedUDPDefs{
       if ( cache != null ){
         // We have the cache, we use it if it is not expired
         if ( !cache.isExpried() ){
-          upLryDataOut  = cache.getData();
+          upLyrDataOut  = cache.getData();
           usingCache    = true;
         }else{
           // Data is expired, remove it
@@ -162,7 +162,7 @@ public class CachedUDPServer implements CachedUDPDefs{
     
     
     
-    if ( upLryDataOut == null ){
+    if ( upLyrDataOut == null ){
       // Data out is still null, then we have to 
       // generate new response and cache it.
       
@@ -173,31 +173,31 @@ public class CachedUDPServer implements CachedUDPDefs{
           ByteBuffer.allocate(MAX_PACKET_SIZE - clntRec.buffer.position());
       upLyrDataIn.put(clntRec.buffer);
       upLyrDataIn.flip();
-      upLryDataOut = consumeRequest(upLyrDataIn);
+      upLyrDataOut = consumeRequest(upLyrDataIn);
       
       
       // Save it to cache
-      Cache cache = new Cache(upLryDataOut);
+      Cache cache = new Cache(upLyrDataOut);
       this.cacheMap.put( header.getToken(), cache );
       
     }
     
     
     // We got upperlayer's data, create a new pay-load
-    ByteBuffer dataOut = genPayLoad();
+    ByteBuffer dataOut = CachedUDPUtils.genPayLoad();
     int pktOpt;
     if ( usingCache ) {
       pktOpt = CachedUDPHeader.CU_RSP_CACHE;
     }else{
-      pktOpt = CachedUDPHeader.CU_RSP_NOCHA;
+      pktOpt = CachedUDPHeader.CU_RSP_NOCAC;
     }
     CachedUDPHeader.putHeader(dataOut, pktOpt, header.getToken());
     
     
     // Put upper layer data-out to this layer data-out
-    dataOut.put(upLryDataOut);
+    dataOut.put(upLyrDataOut);
     dataOut.flip();
-    upLryDataOut.flip();
+    upLyrDataOut.flip();
     
     
     // Send the data to client
@@ -210,20 +210,6 @@ public class CachedUDPServer implements CachedUDPDefs{
       
     }
     
-  }
-  
-  
-  
-  
-  
-  /**
-   * Generates CachedUDP pay load packet
-   * @param type
-   * @return
-   */
-  private ByteBuffer genPayLoad(){
-    ByteBuffer payload = ByteBuffer.allocate(MAX_PACKET_SIZE);
-    return payload;
   }
   
   
