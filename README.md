@@ -18,12 +18,6 @@ CU_REQ_NOCAC| Request from client, cache is not allowed in response.
 CU_RSP_NOCAC| Response from server, no cache is used.
 
 ## How it works
-Client                        Server
------->-->--[token]request->--->-->
-    -lost<---<--<--response<--<---cachemap<token, response>
------>---->-[token]request->--->-->
-<----<-----<----cachedresponse--<--
-
 1. If client is agreed to use cache, the request header is created with a random token.
 2. After to request is recieved by server, the response is created and stored in a Hashmap.
 3. If the response packet is lossed somehow, the client will request the server again with the same token, and the response will be retrived from the token hashmap in the server side.
