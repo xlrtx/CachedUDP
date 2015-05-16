@@ -281,8 +281,9 @@ public class CachedUDPServer implements CachedUDPDefs{
       
     } catch (IOException e) {
       
-      System.err.println("Can't start server.");
+      System.err.println("Can't start server, shutting down.");
       e.printStackTrace();
+      System.exit(1);
       
       
     }
