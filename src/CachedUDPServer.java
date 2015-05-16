@@ -18,19 +18,8 @@ public class CachedUDPServer implements CachedUDPDefs{
   private int port;
   // Cache store
   private HashMap<Integer, Cache> cacheMap;
-  
-  
-  
-  
-  /**
-   * Main entry for debugging
-   * @param args
-   * @throws IOException
-   */
-  public static void main( String args[] ) throws IOException{
-    CachedUDPServer myserver = new CachedUDPServer(7777);
-    myserver.start();
-  }
+  // Upper layer callee
+  private CachedUDPServerCallback callee;
   
   
   
@@ -41,58 +30,13 @@ public class CachedUDPServer implements CachedUDPDefs{
    * @param servPort
    * @throws IOException
    */
-  public CachedUDPServer(int servPort) {
+  public CachedUDPServer(CachedUDPServerCallback callee, int servPort) {
     this.port       = servPort;
     this.cacheMap   = new HashMap<Integer, Cache>();
+    this.callee     = callee;
   }
   
-  
-  
-  
-  
-  /**
-   * A dummy application level function, consumes
-   * the data passed by smart UDP layer, and generate
-   * reply message
-   * @param dataIn
-   * @return
-   * @throws Exception
-   */
-  ByteBuffer consumeRequest(ByteBuffer dataIn) throws Exception{
-    ByteBuffer dataOut = ByteBuffer.allocate(512);
-    dataOut.put(new String("hello from server").getBytes());
-    return dataOut;
-  }
-  
-  
-  
-  
-  
-  /**
-   * Setup server's selector and channel
-   * @param selector
-   * @param channel
-   * @throws IOException
-   */
-  private void serverSetup(Selector selector, DatagramChannel channel) throws IOException{
-    
-    
-    // Open selector for channel to register
-    selector  = Selector.open();
-    // Open channel
-    channel   = DatagramChannel.open();
-    
-    
-    // Set channel non-blocking
-    channel.configureBlocking(false);
-    // Bind channel (UDP server) to port
-    channel.socket().bind(new InetSocketAddress(this.port));
-    // Register channel with the selector
-    channel.register(selector, SelectionKey.OP_READ, new ClientRecord());
-    
-    
-  }
-  
+
   
   
   
@@ -173,7 +117,7 @@ public class CachedUDPServer implements CachedUDPDefs{
           ByteBuffer.allocate(MAX_PACKET_SIZE - clntRec.buffer.position());
       upLyrDataIn.put(clntRec.buffer);
       upLyrDataIn.flip();
-      upLyrDataOut = consumeRequest(upLyrDataIn);
+      upLyrDataOut = this.callee.consumeRequest(upLyrDataIn);
       
       
       // Save it to cache
@@ -201,7 +145,7 @@ public class CachedUDPServer implements CachedUDPDefs{
     
     
     // Send the data to client
-    int bytesSent = channel.send(clntRec.buffer, clntRec.clientAddress);
+    int bytesSent = channel.send(dataOut, clntRec.clientAddress);
     if (bytesSent != 0) { 
       
     }else{
@@ -321,7 +265,18 @@ public class CachedUDPServer implements CachedUDPDefs{
     try {
       
       
-      serverSetup(selector, channel);
+      // Open selector for channel to register
+      selector  = Selector.open();
+      // Open channel
+      channel   = DatagramChannel.open();
+      
+      
+      // Set channel non-blocking
+      channel.configureBlocking(false);
+      // Bind channel (UDP server) to port
+      channel.socket().bind(new InetSocketAddress(this.port));
+      // Register channel with the selector
+      channel.register(selector, SelectionKey.OP_READ, new ClientRecord());
       
       
     } catch (IOException e) {
@@ -346,8 +301,8 @@ public class CachedUDPServer implements CachedUDPDefs{
         
       } catch (SelectorTimeoutException e) {
         
-        System.err.println("Server time out handled successfuly.");
-        break;
+        //if ( DEBUG )  System.err.println("Server time out handled successfuly.");
+        continue;
         
       }
       

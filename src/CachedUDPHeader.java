@@ -42,9 +42,10 @@ public class CachedUDPHeader {
    * @param dataIn
    * @param packetOpt
    * @param packetToken
+   * @return Header
    * @throws PuttingCachedUDPHeaderToByteBufferException
    */
-  public static void putHeader(ByteBuffer dataIn, int packetOpt, int packetToken) 
+  public static CachedUDPHeader putHeader(ByteBuffer dataIn, int packetOpt, int packetToken) 
       throws PuttingCachedUDPHeaderToByteBufferException{
     
     
@@ -64,6 +65,8 @@ public class CachedUDPHeader {
       throw new PuttingCachedUDPHeaderToByteBufferException("Packet option is invalid.");
       
     }
+    
+    return new CachedUDPHeader(packetOpt, packetToken);
 
   }
   
@@ -77,9 +80,9 @@ public class CachedUDPHeader {
    * @param packetToken
    * @throws PuttingCachedUDPHeaderToByteBufferException
    */
-  public static void putHeader(ByteBuffer dataIn, int packetOpt) 
+  public static CachedUDPHeader putHeader(ByteBuffer dataIn, int packetOpt) 
       throws PuttingCachedUDPHeaderToByteBufferException{
-    putHeader(dataIn, packetOpt, randToken());
+    return putHeader(dataIn, packetOpt, randToken());
   }
   
   
@@ -137,10 +140,10 @@ public class CachedUDPHeader {
   private static boolean isValidHeader( int packetId, int packetOpt ){
     
     if ( packetId != CU_PACKET_ID ||
-        packetOpt != CU_REQ_CACHE ||
-        packetOpt != CU_RSP_CACHE ||
-        packetOpt != CU_REQ_NOCAC ||
-        packetOpt != CU_RSP_NOCAC ){
+        ((packetOpt != CU_REQ_CACHE) && 
+         (packetOpt != CU_RSP_CACHE) && 
+         (packetOpt != CU_REQ_NOCAC) && 
+         (packetOpt != CU_RSP_NOCAC)) ){
       
       
       // Not a CachedUDP packet
@@ -253,14 +256,11 @@ public class CachedUDPHeader {
   private static int randToken() {
 
     Random rand = new Random();
-    int max = Integer.MAX_VALUE;
-    int min = Integer.MIN_VALUE;
-    int randomNum = rand.nextInt((max - min) + 1) + min;
-    return randomNum;
+    return rand.nextInt();
     
 }
   
-  
+
   
   
   
